@@ -1,0 +1,23 @@
+---
+- name: Disable Proxomx WebUI nag (sorry Proxmox I will pay when I can afford it)
+  hosts: all
+  become: true
+  gather_facts: yes
+  tasks:
+    - name: Check if patch has been applied
+      shell: >
+        grep -q "res === null || res === undefined || !res || false" 
+        /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+      register: patch_applied
+      changed_when: false
+      failed_when: false
+      ignore_errors: true
+
+    - debug: var=patch_applied
+
+    - name: Apply patch
+      ansible.builtin.replace:
+        path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+        regexp: res\s*\.data\.status\.toLowerCase\(\) !== 'active'
+        replace: 'false'
+      when: patch_applied.rc == 1

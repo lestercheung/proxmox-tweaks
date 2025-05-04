@@ -1,0 +1,7 @@
+---
+# site.yml
+- name: Include no-nag.yml
+  ansible.builtin.import_playbook: 'no-nag.yml'
+
+- name: Repo
+  ansible.builtin.import_playbook: 'community-repo.yml'
